@@ -14,7 +14,7 @@ library(here)
 
 ############################################################################
 # Función para generar curvas de Andrews en ggplot
-source(here("R/AnalisisDescriptivo/andrewsCurves.R"))
+source(here("andrewsCurves.R"))
 ############################################################################
 
 # El comando str permite identificar de forma rápida el número de obs. y el
@@ -77,6 +77,11 @@ faces2(iris[,c(4,3,2,1)])
 
 ############################################################################
 # Curvas de Andrews (mi versión)
+
+#Para datos no agrupados
+andrewsCurves(as.matrix(iris[,-5]),iris[,5],is.grouped = F)
+
+#Para datos agrupados
 andrewsCurves(as.matrix(iris[,-5]),iris[,5])
 
 # El orden importa y cambia las curvas
