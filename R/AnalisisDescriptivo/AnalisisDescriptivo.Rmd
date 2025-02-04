@@ -1,6 +1,6 @@
 ---
 title: "Análisis Descriptivo Multivariado de Iris"
-subtitle: "Análisis Multivariado: Semestre 2024-I"
+subtitle: "Análisis Multivariado: Semestre 2025-II"
 author: "José A. Perusquía Cortés"
 output: 
     pdf_document:
