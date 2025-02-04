@@ -48,13 +48,16 @@ ggpairs(iris, aes(color = Species, alpha = 0.5),
 
 # La función corrplot nos permite de forma gráfica entender la correlación
 # por pares de las variables. Para datos no etiquetados usamos
-corrplot(cor(iris[,-5]),method="ellipse")
+corrplot(cor(iris[,-5]),method="ellipse",tl.pos='l')
 
 # Si tenemos acceso a las etiquetas podemos generar las correlaciones por 
 # grupo, seleccionando los renglones apropiadados.
-corrplot(cor(iris[which(iris$Species=="setosa"),-5]),method="ellipse")
-corrplot(cor(iris[which(iris$Species=="versicolor"),-5]),method="ellipse")
-corrplot(cor(iris[which(iris$Species=="virginica"),-5]),method="ellipse")
+corrplot(cor(iris[which(iris$Species=="setosa"),-5]),method="ellipse",
+         tl.pos='n')
+corrplot(cor(iris[which(iris$Species=="versicolor"),-5]),method="ellipse",
+         tl.pos='n')
+corrplot(cor(iris[which(iris$Species=="virginica"),-5]),method="ellipse",
+         tl.pos='n')
 ############################################################################
 
 ############################################################################
