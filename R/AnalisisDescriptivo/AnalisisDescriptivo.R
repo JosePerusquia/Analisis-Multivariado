@@ -87,7 +87,6 @@ andrewsCurves(as.matrix(iris[,-5]),iris[,5])
 # El orden importa y cambia las curvas
 andrewsCurves(as.matrix(iris[,c(4,3,2,1)]),iris[,5])
 
-
 # Curvas de Andrews con paqueteria pracma (coordenadas polares)
 andrewsplot(as.matrix(iris[,-5]),iris[,5])
 
