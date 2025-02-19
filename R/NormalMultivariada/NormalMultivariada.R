@@ -1,11 +1,12 @@
-############################################################################
-# Distribución normal multivariada y distribuciones asociadas
-# Autor: José A. Perusquía Cortés
-############################################################################
+################################################################################
+# Distribución normal multivariada y distribuciones asociadas                                            
+# Autor: Jose Antonio Perusquia Cortes
+# Afil: Facultad de Ciencias - UNAM
+# Curso: Análisis Multivariado
+################################################################################
 
-############################################################################
+################################################################################
 # Librerías   
-
 library(ggplot2)
 library(GGally)
 library(ggthemes)
@@ -18,9 +19,9 @@ library(car)
 library(ICSNP)  # Pruebas de hipótesis Hotelling
 library(here)
 source(here('pruebasGraficasNormMult.R'))
-############################################################################
+################################################################################
 
-############################################################################
+################################################################################
 # Ejemplo de distribución normal multivariada no degenerada                                               
 
 # Parámetros
@@ -44,8 +45,8 @@ mvds <- dmvnorm(grid,mu,sigma)
 matrix_mvds <-  matrix(mvds, nrow = 100)
 
 # Perspectiva
-persp(matrix_mvds, theta =270, phi = 30, expand = 0.6, 
-      shade = 0.2, col = "lightblue", xlab = expression(x),
+persp(matrix_mvds, theta =200, phi = 30, expand = 0.6, 
+      shade = 0.1, col = "lightblue", xlab = expression(x),
       ylab = expression(y), zlab = expression(f))
 
 
@@ -53,17 +54,16 @@ persp(matrix_mvds, theta =270, phi = 30, expand = 0.6,
 X=rmvnorm(10000,mu,sigma)
 sigma_inv=solve(sigma)
 
-ggpairs(as.data.frame(X),upper = list(continuous = wrap("cor")))
+ggpairs(as.data.frame(X),upper = list(continuous = wrap("cor",size = 9)))
 
 Y=matrix(nrow=10000,ncol=2)
 for(i in 1:10000){
   Y[i,]=sqrtm(sigma_inv)%*%(X[i,]-mu)
 }
 
-ggpairs(as.data.frame(Y),upper = list(continuous = wrap("cor")))
+ggpairs(as.data.frame(Y),upper = list(continuous = wrap("cor",size=9)))
 
 # Curvas de nivel v1
-
 z = matrix(0,nrow=100,ncol=100)
 
 for (i in 1:100) {
@@ -76,9 +76,9 @@ contour(x,y,z,xlim=c(-4,4),ylim=c(-4,4))
 
 # Curvas de nivel v2
 plot_ly(x=x,y=y,z=z,type = "contour")
-############################################################################
+################################################################################
 
-############################################################################
+################################################################################
 # Checar normalidad. Pruebas gráficas y pruebas de Mardia, Royston y
 # Henze-Zirkler
 
@@ -94,7 +94,12 @@ mvn(multnorm.sample,mvnTest="mardia",
     multivariatePlot = "none")$multivariateNormality
 
 # Iris
+
+# Pruebas univariadas
 pruebas_normalidad_univariadas(as.matrix(iris[,-5]))
+pruebas_normalidad_univariadas(as.matrix(iris[,-5]),prueba='lillie')
+pruebas_normalidad_univariadas(as.matrix(iris[,-5]),prueba='sf')
+pruebas_normalidad_univariadas(as.matrix(iris[,-5]),prueba='cvm')
 prueba_forma_cuad(as.matrix(iris[,-5]))
 
 mvn(as.matrix(iris[,-5]),mvnTest="hz",
@@ -103,11 +108,9 @@ mvn(as.matrix(iris[,-5]),mvnTest="royston",
     multivariatePlot = "none")$multivariateNormality
 mvn(as.matrix(iris[,-5]),mvnTest="mardia",
     multivariatePlot = "none")$multivariateNormality
+################################################################################
 
-###########################################################################
-
-
-############################################################################
+################################################################################
 # Distribución Wishart              
 set.seed(3141592)
 W=rWishart(n=4,df=2,Sigma=diag(1,2))
@@ -117,10 +120,9 @@ ellipse(c(0, 0), shape=W[,,1], radius=1, col="red", lty=2,add=F,xlim=c(-2,2),
 ellipse(c(0, 0), shape=W[,,2], radius=1, col="blue", lty=2)
 ellipse(c(0, 0), shape=W[,,3], radius=1, col="green", lty=2)
 ellipse(c(0, 0), shape=W[,,4], radius=1, col="purple", lty=2)
-############################################################################
+################################################################################
 
-
-############################################################################
+################################################################################
 # Pruebas de hipótesis                                      
 mu=c(64.1,64.7)
 sigma=matrix(c(191,155.6,155.6,313.5),byrow = T,nrow=2)
@@ -172,5 +174,4 @@ ConfReg=data.frame(ellipse(mu_bar, shape=sigma_hat,
                            col="red",add=F,draw=F, lty=2))
 
 p+geom_point(data=ConfReg,aes(x=x,y=y),col="blue",size=.1)
-
-############################################################################
+################################################################################

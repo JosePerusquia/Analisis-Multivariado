@@ -1,13 +1,11 @@
 ############################################################################
-# Título:
-#     Pruebas para checar la distribución normal multivariada
+# Título: Pruebas normalidad multivariada
+# Autor: José A. Perusquía Cortés
+# Afil: Facultad de Ciencias - UNAM
+# Curso: Análisis Multivariado
 #
-# Autor: 
-#     José A. Perusquía Cortés
-#
-# Descripción: 
-#     Código para generar las gráficas básicas para checar la normalidad
-#     multivariada de un conjunto de datos
+# Descripción: Código para generar las gráficas básicas para checar
+# la normalidad multivariada de un conjunto de datos
 ############################################################################
 
 ############################################################################
@@ -18,7 +16,8 @@ library(ggthemes)
 library(nortest)
 ############################################################################
 
-# Función para crear el histograma, el qqplot, la gráfica de caja y
+##############################################################################
+# Función para crear el histograma, el qqplot, boxplot y
 # alguna de las pruebas no paramétricas soportadas por la librería nortest
 # (exceptuando la de Pearson). Por default realiza la de Anderson-Darling 'ad'
 # y se puede cambiar por Cramer-von Mises 'cvm', Lilliefors 'lillie' o
@@ -33,7 +32,8 @@ pruebas_normalidad_univariadas=function(X,prueba="ad"){
     
     # Histograma
     h=ggplot(data=df,aes(var))+
-      geom_histogram(breaks=hist(X[,i],plot=F)$breaks,alpha=.5,col='black')+
+      geom_histogram(breaks=hist(X[,i],plot=F)$breaks,alpha=.5,
+                     col='black',fill='skyblue3')+
       labs(title='',x='',y='')+
       theme_minimal()+
       theme(axis.title =element_text(size=8))
@@ -63,7 +63,7 @@ pruebas_normalidad_univariadas=function(X,prueba="ad"){
     
     # boxplot
     bx=ggplot(df, aes(var)) +
-      geom_boxplot(outlier.alpha=.75)+
+      geom_boxplot(outlier.alpha=.75,col='black',fill='skyblue3')+
       theme_minimal()+
       labs(x="")+
       ylim(-.75,.75)
@@ -78,7 +78,7 @@ pruebas_normalidad_univariadas=function(X,prueba="ad"){
       pv=ggplot(df1, aes(x,y,label=text)) +
         geom_text()+
         theme_transparent()
-    }else if(prueba=="cmv"){
+    }else if(prueba=="cvm"){
       p_val=cvm.test(X[,i])$p
       prueba_res=paste("Cramer-von Mises:",' ',round(p_val,5))
       x=0
@@ -118,8 +118,9 @@ pruebas_normalidad_univariadas=function(X,prueba="ad"){
 
   
 }
+################################################################################
 
-
+################################################################################
 # Función para crear el qqplot de la forma cuadrática de la distribución
 # normal multivariada para compararla con los cuantiles de una distribución
 # ji-cuadrada de p grados de libertad. Por default la función hace estimación
@@ -166,3 +167,6 @@ prueba_forma_cuad=function(X,estimate="T",mu,sigma){
     theme(axis.title =element_text(size=8))
   plot(q)
 }
+################################################################################
+
+
