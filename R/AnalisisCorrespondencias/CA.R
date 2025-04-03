@@ -1,7 +1,9 @@
-##############################################################################
-# Análisis de correspondencias
-# Autor: José A. Perusquía Cortés
-##############################################################################
+################################################################################
+# Análisis de correspondencias                                        
+# Autor: Jose Antonio Perusquia Cortes
+# Afil : Facultad de Ciencias - UNAM
+# Curso : Análisis Multivariado
+################################################################################
 
 ##############################################################################
 # Librerías
@@ -24,23 +26,23 @@ health=matrix(c(243,789,167,18,6,
               nrow=7,ncol=5,byrow=T)
 
 ## Total de observaciones
-n=sum(health)
+n=sum(health);n
 
 ## Suma por renglones y columnas
-row_sum=apply(health,1,sum)
-col_sum=apply(health,2,sum)
+row_sum=apply(health,1,sum);row_sum
+col_sum=apply(health,2,sum);col_sum
 
 ## Masas y centroide
-row_masses=row_sum/n
-centroide=col_sum/n
+row_masses=row_sum/n;row_masses
+centroide=col_sum/n;centroide
 
 ## Matrices diagonales de masas y centroide
-Dr=diag(row_masses)
-Dc=diag(1/centroide)
+Dr=diag(row_masses);Dr
+Dc=diag(1/centroide);Dc
 
 ## Raiz cuadrada de matrices diagonales
-Dr_sq=sqrtm(Dr)
-Dc_sq=sqrtm(Dc)
+Dr_sq=sqrtm(Dr);Dr_sq
+Dc_sq=sqrtm(Dc);Dc_sq
 
 ## Perfiles por renglón
 profiles=matrix(0,nrow=7,ncol=5)
@@ -48,49 +50,135 @@ for(i in 1:7){
   profiles[i,]=health[i,]/row_sum[i]
 }
 
+profiles
+
 ## Matriz quitando el centroide
 R=matrix(0,nrow=7,ncol=5)
 for(i in 1:7){
   R[i,]=profiles[i,]-centroide
 }
+R
 
 ## Encontramos la descomposición gsvd 
 res=svd(Dr_sq%*%R%*%Dc_sq)
 
 ## Valores propios
-values=res$d
+values=res$d;values
 
 ## Matrices
-U=res$u
-V=res$v
+U=res$u;U
+V=res$v;V
 
-N=solve(Dr_sq)%*%U
-M=solve(Dc_sq)%*%V
+N=solve(Dr_sq)%*%U;N
+M=solve(Dc_sq)%*%V;M
 
 ## Coordenadas de los renglones
-f=N[,c(1:2)]%*%diag(values[c(1:2)])
+f=N[,c(1:2)]%*%diag(values[c(1:2)]);f
 
-df_points=data.frame(x=f[,1],y=c(0,0,0,0,0,0,0))
-df_labels=data.frame(x=f[,1],y=c(.1,-.1,.1,-.1,.1,-.1,.1))
+df_points=data.frame(x=f[,1],y=f[,2])
+df_labels=data.frame(x=f[,1],y=f[,2])
 
-p=ggplot(data=df_points,aes(x=x,y=y))+
-  geom_point(size=1)+
-  geom_text(data=df_labels,show.legend=F,
+ggplot(data=df_points,aes(x=x,y=y))+
+  geom_text(show.legend=F,size=3,
             aes(label = c("16-24","25-34","35-44",
                           "45-54","55-64","65-74","75+")))+
   theme_minimal()+
   labs(x="",y="")+
-  ylim(c(-.5,.5))+
-  theme(axis.text.x = element_blank(),
-        axis.text.y = element_blank())
-p
+  ylim(c(-.2,.2))
 ##############################################################################
 
 ##############################################################################
 # Problema dual estado de salud
-health=t(health)
+health_d=t(health)
 
 ## Suma por renglones y columnas
+row_sum_d=apply(health_d,1,sum)
+col_sum_d=apply(health_d,2,sum)
+
+## Masas y centroide
+row_masses_d=row_sum_d/n
+centroide_d=col_sum_d/n
+
+## Matrices diagonales de masas y centroide
+Dr_d=diag(row_masses_d)
+Dc_d=diag(1/centroide_d)
+
+## Raiz cuadrada de matrices diagonales
+Dr_sq_d=sqrtm(Dr_d)
+Dc_sq_d=sqrtm(Dc_d)
+
+## Perfiles por renglón
+profiles_d=matrix(0,nrow=5,ncol=7)
+for(i in 1:5){
+  profiles_d[i,]=health_d[i,]/row_sum_d[i]
+}
+
+## Matriz quitando el centroide
+R_d=matrix(0,nrow=5,ncol=7)
+for(i in 1:5){
+  R_d[i,]=profiles_d[i,]-centroide_d
+}
+
+## Encontramos la descomposición gsvd 
+res_d=svd(Dr_sq_d%*%R_d%*%Dc_sq_d)
+
+## Valores propios
+values_d=res_d$d
+
+## Matrices
+U_d=res_d$u
+V_d=res_d$v
+
+N_d=solve(Dr_sq_d)%*%U_d
+M_d=solve(Dc_sq_d)%*%V_d
+
+## Coordenadas de los renglones
+g=N_d[,c(1:2)]%*%diag(values_d[c(1:2)])
+
+df_points_dual=data.frame(x=g[,1],y=g[,2])
+df_labels_dual=data.frame(x=g[,1],y=g[,2])
+
+ggplot(data=df_points_dual,aes(x=x,y=y))+
+  geom_text(show.legend=F,col="red",size=3,
+            aes(label = c("Muy Bueno","Bueno","Regular",
+                          "Malo","Muy Malo")))+
+  theme_minimal()+
+  labs(x="",y="")+
+  ylim(c(-.2,.2))
+
+# Se grafican las dos
+ggplot(data=df_labels,aes(x=x,y=y))+
+  geom_text(show.legend = F,size=3,aes(label = c("16-24","25-34","35-44",
+                                                 "45-54","55-64","65-74",
+                                                 "75+")))+
+  geom_text(show.legend=F,data=df_labels_dual,col='red',size=3,
+            aes(label = c("Muy Bueno","Bueno","Regular","Malo","Muy Malo")))+
+  theme_minimal()+
+  labs(x="",y="")+
+  ylim(c(-.2,.2))
+
+# Existe un posible error al momento de graficar, por la no 
+# unicidad de los valores singulares que están definidos
+# salvo un signo. 
+
+df_labels_dual=data.frame(x=-g[,1],y=g[,2])
+
+# Se grafican las dos
+ggplot(data=df_labels,aes(x=x,y=y))+
+  geom_text(show.legend = F,size=3,aes(label = c("16-24","25-34","35-44",
+                                                 "45-54","55-64","65-74",
+                                                 "75+")))+
+  geom_text(show.legend=F,data=df_labels_dual,col='red',size=3,
+            aes(label = c("Muy Bueno","Bueno","Regular","Malo","Muy Malo")))+
+  theme_minimal()+
+  labs(x="",y="")+
+  ylim(c(-.2,.2))
+##############################################################################
+
+##############################################################################
+# Datos salud (método svd: algoritmo 2)
+
+## Sumas por renglones y columnas
 row_sum=apply(health,1,sum)
 col_sum=apply(health,2,sum)
 
@@ -98,66 +186,58 @@ col_sum=apply(health,2,sum)
 row_masses=row_sum/n
 centroide=col_sum/n
 
-## Matrices diagonales de masas y centroide
+## Matriz diagonales de masas y centroide
 Dr=diag(row_masses)
-Dc=diag(1/centroide)
+Dc=diag(centroide)
 
 ## Raiz cuadrada de matrices diagonales
-Dr_sq=sqrtm(Dr)
-Dc_sq=sqrtm(Dc)
+Dr_sq=solve(sqrtm(Dr))
+Dc_sq=solve(sqrtm(Dc))
 
-## Perfiles por renglón
-profiles=matrix(0,nrow=5,ncol=7)
-for(i in 1:5){
-  profiles[i,]=health[i,]/row_sum[i]
-}
+## Transformamos a matrices las masas y centroides
+row_m=as.matrix(row_masses)
+centroide_m=as.matrix(centroide)
 
-## Matriz quitando el centroide
-R=matrix(0,nrow=5,ncol=7)
-for(i in 1:5){
-  R[i,]=profiles[i,]-centroide
-}
+## Matriz de correspondencias
+P=health/n
 
-## Encontramos la descomposición gsvd 
-res=svd(Dr_sq%*%R%*%Dc_sq)
+## Matriz estandarizada y centrada
+A=Dr_sq%*%(P-(row_m%*%t(centroide_m)))%*%Dc_sq
 
-## Valores propios
+## svd de A
+res=svd(A)
+
+## Valores singulares y vectores
 values=res$d
-
-## Matrices
 U=res$u
 V=res$v
 
-N=solve(Dr_sq)%*%U
-M=solve(Dc_sq)%*%V
+## Coordenadas estándar
+X=Dr_sq%*%U
+Y=Dc_sq%*%V
 
-## Coordenadas de los renglones
-g=N[,c(1:2)]%*%diag(values[c(1:2)])
-
-
-df_points_dual=data.frame(x=g[,1],y=c(0,0,0,0,0))
-df_labels_dual=data.frame(x=g[,1],y=c(.15,-.15,.15,-.15,.15))
-
-p=ggplot(data=df_points_dual,aes(x=x,y=y))+
-  geom_point(size=1,col="red")+
-  geom_text(data=df_labels_dual,show.legend=F,col="red",
-            aes(label = c("Muy Bueno","Bueno","Regular","Malo","Muy Malo")))+
-  theme_minimal()+
-  labs(x="",y="")+
-  ylim(c(-.5,.5))+
-  theme(axis.text.x = element_blank(),
-        axis.text.y = element_blank())
-p
+## Coordenadas principales
+f=X%*%diag(res$d)
+g=Y%*%diag(res$d)
 
 
-p+geom_point(size=1,data=df_points)+
-  geom_text(show.legend=F,data=df_labels,
+## Graficamos 
+df=data.frame(x=f[,1],y=f[,2])
+df_dual=data.frame(x=g[,1],y=g[,2])
+
+
+ggplot(df,aes(x=x,y=y))+
+  geom_text(size=3,show.legend=F,
             aes(label = c("16-24","25-34","35-44",
-                          "45-54","55-64","65-74","75+")))+
+                          "45-54","55-64","65-74",
+                          "75+")))+
+  geom_text(size=3,show.legend=F,data=df_dual,col='red',
+            aes(label = c("Muy Bueno","Bueno","Regular",
+                          "Malo","Muy Malo")))+
   theme_minimal()+
-  labs(x="",y="")+
-  theme(axis.text.x = element_blank(),
-        axis.text.y = element_blank())
+  labs(x='',y='')+
+  ylim(c(-.2,.2))+
+  xlim(c(-.45,.77))
 ##############################################################################
 
 ##############################################################################
