@@ -12,6 +12,9 @@ library(ggthemes)
 library(RColorBrewer)
 library(expm)
 library(ca)
+library(here)
+library(dplyr)
+library(readxl)
 ##############################################################################
 
 ##############################################################################
@@ -387,15 +390,14 @@ p+geom_text(size=3.5,show.legend=F,data=df_dual,
 ##############################################################################
 
 ##############################################################################
-# Análisis de correspondencias múltiple vinos
+# Análisis de correspondencias múltiple vinos con matriz indicadora
 vinos=matrix(c(1,0,0,0,1,0,1,1,0,0,1,0,0,1,0,1,0,1,0,1,0,1,
                0,1,0,1,0,1,0,0,1,1,0,0,1,0,1,0,0,1,1,0,1,0,
                0,1,1,0,0,1,0,0,1,1,0,1,0,0,1,0,0,1,1,0,1,0,
                0,1,1,0,0,1,0,0,1,1,0,1,0,0,1,0,1,0,1,0,1,0,
                1,0,0,0,1,0,1,1,0,0,1,0,0,1,0,1,1,0,0,1,0,1,
                1,0,0,1,0,0,1,1,0,0,1,0,1,0,0,1,1,0,0,1,0,1),
-             nrow=6,
-             ncol=22,byrow=T)
+             nrow=6,ncol=22,byrow=T)
 
 ## Total de observaciones
 n=sum(vinos)
@@ -442,14 +444,12 @@ Y=Dc_sq%*%V
 f=X%*%diag(res$d)
 g=Y%*%diag(res$d)
 
-## Graficamos 
-df=data.frame(x=f[,1],y=f[,2])
-set.seed(5)
-df_dual=data.frame(x=g[,1]+rep(c(.2,-.2),11),y=g[,2]+rnorm(22,0,.15))
-
+## Graficamos modificando las coordenadas para que sea visible
+set.seed(31415)
+df=data.frame(x=f[,1],y=f[,2]+rnorm(6,0,.5))
+df_dual=data.frame(x=g[,1],y=g[,2]+rnorm(6,0,.5))
 
 p=ggplot(df_dual,aes(x=x,y=y))+
-  geom_point(size=1,alpha=0)+
   geom_text(size=3.5,show.legend=F,data=df_dual,
             aes(label = c("Fruity-Y",
                           "Fruity-N",
@@ -492,14 +492,95 @@ f_new[2]=sum(r_new*g[,2])/values[2]
 df_new=data.frame(x=f_new[1],y=f_new[2]-4)
 
 ## Graficamos
-p+geom_text(size=3.5,data=df_new,aes(label="W7"),col="blue")+
-  ylim(-1,2.5)
+p+geom_text(size=3.5,data=df_new,aes(label="W7"),col="blue")
 
 # Inercias sin modificar
 inercias=res$d^2
 
+#Inercia total
+inercia = sum(inercias)
+
 # Contribución a la inercia
-contribucion=inercias/(sum(inercias))
+contribucion=inercias/inercia;contribucion
+
+# Inercia acumulada
+cumsum(contribucion)
+##############################################################################
+
+##############################################################################
+# Análisis de correspondencia múltiple para la encuesta
+# sobre la familia y los cambios de rol (1994)
+women = read_xls(here('../Datos/women5.xls'))
+
+labels = as.matrix(women[,1])
+women = women%>%
+  select(-...1)
+
+women=as.matrix(women)
+
+## Total de observaciones
+n=sum(women)
+
+## Sumas por renglones y columnas
+row_sum=apply(women,1,sum)
+col_sum=apply(women,2,sum)
+
+## Masas y centroide
+row_masses=row_sum/n
+centroide=col_sum/n
+
+## Matriz diagonales de masas y centroide
+Dr=diag(row_masses)
+Dc=diag(centroide)
+
+## Raiz cuadrada de matrices diagonales
+Dr_sq=solve(sqrtm(Dr))
+Dc_sq=solve(sqrtm(Dc))
+
+## Transformamos a matrices las masas y centroides
+row_m=as.matrix(row_masses)
+centroide_m=as.matrix(centroide)
+
+## Matriz de correspondencias
+P=women/n
+
+## Matriz estandarizada y centrada
+A=Dr_sq%*%(P-(row_m%*%t(centroide_m)))%*%Dc_sq
+
+## svd de A
+res=svd(A)
+
+## Valores singulares y vectores
+values=res$d
+U=res$u
+V=res$v
+
+## Coordenadas estándar
+X=Dr_sq%*%U
+Y=Dc_sq%*%V
+
+## Coordenadas principales
+f=X%*%diag(res$d)
+g=Y%*%diag(res$d)
+
+## Graficamos 
+df=data.frame(x=f[,1],y=f[,2])
+df_dual=data.frame(x=g[,1],y=g[,2])
+
+ggplot(df_dual,aes(x=x,y=y))+
+  geom_text(size=3.5,show.legend=F,data=df_dual,
+            aes(label = labels))+
+  theme_minimal()+
+  labs(x="",y="")
+
+# Inercias sin modificar
+inercias=res$d^2;inercias
+
+# Inercia total
+inercia=sum(inercias)
+
+# Contribución a la inercia
+contribucion=inercias/inercia;contribucion
 
 # Inercia acumulada
 cumsum(contribucion)
@@ -508,19 +589,17 @@ cumsum(contribucion)
 inercias_c=numeric(length(inercias))
 
 for(i in 1:length(inercias)){
-  if(inercias[i]>1/10){
-    inercias_c[i]=((10/9)*(inercias[i]-(1/10)))^2
+  if(inercias[i]>1/4){
+    inercias_c[i]=((4/3)*(sqrt(inercias[i])-(1/4)))^2
   }
 }
 
 # Greenacre inercia total
-Jbar=(10/9)*(sum(inercias^2)-((22-10)/(10^2)))
+Jbar=(4/3)*(sum(inercias)-((16-4)/(4^2)));Jbar
 
 # Contribución a la inercia
-contribucion_c=inercias_c/Jbar
+contribucion_c=inercias_c/Jbar;contribucion_c
 
 # Inercia acumulada
 cumsum(contribucion_c)
-
 ##############################################################################
-
