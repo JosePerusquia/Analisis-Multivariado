@@ -54,7 +54,8 @@ ggpairs(iris, aes(color = Species, alpha = 0.5),upper = list(continuous = "point
 
 Ahora bien, para entender las posibles relaciones lineales de las variables en cada uno de los grupos, podemos hacer uso de la librería \textbf{corrplot}, la cual nos permite generar la Figura \ref{fig:cor1}. Así hay varios comentarios por hacer, en primera instancia, podemos apreciar que en todos los grupos se observa una correlación positiva para todos los pares de variables. Sin embargo, la correlación entre la longitud y el ancho del sepalo es mucho más fuerte en setosa que versicolor y virginica. En esta última, además se tiene una correlación muy fuerte entre la longitud del sepalo y del petalo. Finalmente, para versicolor se observa una correlación muy alta para todos los pares de variables.
 
-```{r cor1, fig.cap='Gráficas de correlación por grupo.', fig.subcap=c('Setosa', 'Versicolor', 'Virginica'),fig.ncol = 3, out.width = "30%", fig.align = "center",echo=F}
+```{r cor1, fig.cap='Gráficas de correlación por grupo.', fig.subcap=c('Setosa', 'Versicolor', 'Virginica'),fig.ncol = 3, 
+, fig.align = "center",echo=F}
 corrplot(cor(iris[which(iris$Species=="setosa"),-5]),method="ellipse")
 corrplot(cor(iris[which(iris$Species=="versicolor"),-5]),method="ellipse")
 corrplot(cor(iris[which(iris$Species=="virginica"),-5]),method="ellipse")
