@@ -18,7 +18,7 @@ library(purrr)           # Version 1.0.4
 
 #################################################################
 # Source code for Andrews Curves using ggplot
-source(here("andrewsCurves.R"))
+source(here("R/DescriptiveAnalysis/andrewsCurves.R"))
 #################################################################
 
 #################################################################
@@ -112,13 +112,15 @@ faces2(iris[,c(4,3,2,1)])
 # Andrews Curves
 
 # For non-grouped data
-andrewsCurves(as.matrix(iris[,-5]),iris[,5],is.grouped = F)
+andrewsCurves(as.matrix(iris[,-5]))
 
 # For grouped data
-andrewsCurves(as.matrix(iris[,-5]),iris[,5])
+andrewsCurves(as.matrix(iris[,-5]),iris[,5],
+              legend.title = 'Species')
 
 # The order changes the curves
-andrewsCurves(as.matrix(iris[,c(4,3,2,1)]),iris[,5])
+andrewsCurves(as.matrix(iris[,c(4,3,2,1)]),iris[,5],
+              legend.title = 'Species')
 
 # Usin pracma library 
 andrewsplot(as.matrix(iris[,-5]),iris[,5])
