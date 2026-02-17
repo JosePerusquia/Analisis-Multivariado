@@ -122,7 +122,7 @@ andrewsCurves(as.matrix(iris[,-5]),iris[,5],
 andrewsCurves(as.matrix(iris[,c(4,3,2,1)]),iris[,5],
               legend.title = 'Species')
 
-# Usin pracma library 
+# Using pracma library 
 andrewsplot(as.matrix(iris[,-5]),iris[,5])
 andrewsplot(as.matrix(iris[,-5]),iris[,5],style="cart")
 #################################################################
